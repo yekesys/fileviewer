@@ -78,6 +78,24 @@ def test_loi2show(input_param):
     assert expected == filev_utils.loi2show(input_loi, base)
 
 
-
-
+input_data = [ ( [97, 98, 99],
+                 ["a", "b", "c"],
+               ),
+               ( [49, 50, 51],
+                 ["1", "2", "3"],
+               ),
+               ( [233, 224, 232, 240, 945],
+                 ["[E9]", "[E0]", "[E8]", "[F0]", "[3B1]"],
+               ),
+               ( [1488, 9786, 42885],
+                 ["[5D0]", "[263A]", "[A785]"],
+               ),
+               ( range(0, 33),
+                 ["NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL", "BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI", "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB", "CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US", "[ ]"],
+               ),
+             ]
+@pytest.mark.parametrize("input_param", input_data)
+def test_loi2show(input_param):
+    input_loi, expected = input_param
+    assert expected == filev_utils.display_loi(input_loi)
 

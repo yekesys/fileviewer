@@ -6,6 +6,41 @@ Glossary:
 
 """
 
+
+CTRL_CHARS = { 0: "NUL",
+               1: "SOH",
+               2: "STX",
+               3: "ETX",
+               4: "EOT",
+               5: "ENQ",
+               6: "ACK",
+               7: "BEL",
+               8: "BS",
+               9: "HT",
+               10: "LF",
+               11: "VT",
+               12: "FF",
+               13: "CR",
+               14: "SO",
+               15: "SI",
+               16: "DLE",
+               17: "DC1",
+               18: "DC2",
+               19: "DC3",
+               20: "DC4",
+               21: "NAK",
+               22: "SYN",
+               23: "ETB",
+               24: "CAN",
+               25: "EM",
+               26: "SUB",
+               27: "ESC",
+               28: "FS",
+               29: "GS",
+               30: "RS",
+               31: "US",
+               }
+
 def detect_encoding(s: bytes) -> str:
     """
     An attempt to detect the utf encoding
@@ -33,6 +68,11 @@ def txt2loi(s) -> list[int]:
         print("Expecting types str or bytes, found:",type(s))
         return []
 
+def better_hex(i: int) -> str:
+    """
+    My preferred representation of hex
+    """
+    return hex(i)[2:].upper()
 
 def loi2show(loi: list[int], base: str = "dec") -> list[str]:
     """
@@ -51,13 +91,31 @@ def loi2show(loi: list[int], base: str = "dec") -> list[str]:
         return [str(i) for i in loi]
     elif base == "hex":
         print(f"Converting to {base}")
-        return [hex(i)[2:].upper() for i in loi]
+        return [better_hex(i) for i in loi]
     else:
         print(f"Unknown base: {base}, assume decimal")
         return [str(i) for i in loi]
 
     
+def display_one_char(i: int) -> str:
+    """
+    Display an integer as the corresponding character,
+    if the character can be displayed, 
+    otherwise display a ...
+    """
+    if i in range(0, 32):
+        return CTRL_CHARS[i]
+    if i == 32:
+        return "[ ]"
+        #return "."
+    if i in range(33, 126):
+        return chr(i)
+    else:
+        return "[" + better_hex(i) + "]"
 
+
+def display_loi(loi: list[int]) -> list[str]:
+    return [display_one_char(i) for i in loi]
 
 
 if __name__ == "__main__":
@@ -81,6 +139,10 @@ if __name__ == "__main__":
         for b in ["bin", "oct", "hex", "dec"]:
             print(loi2show(txt2loi(s), b))
 
+    for s in ["abc", "123", "éàèðα", "א☺ꞅ"]:
+        print(display_loi(txt2loi(s)))
+
+    print(display_loi(range(0,33)))
 
 
 
