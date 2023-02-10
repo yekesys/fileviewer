@@ -8,4 +8,4 @@ To install and run:
 
 * Clone or download
 * For now, no installations are needed
-* Run python(2) code/...
+* Run python(3) code/run_filev.py
