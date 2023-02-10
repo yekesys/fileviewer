@@ -78,19 +78,18 @@ def loi2show(loi: list[int], base: str = "dec") -> list[str]:
     """
     Return a list of strings, with each string being
     the representation of the integer
+    :param loi: a list of integers
+                Each integer is the ordinal value of a character
     :param base: One of the following: "bin", "oct", "dec", "hex"
     """
+    print(f"Converting to {base}")
     if base == "bin":
-        print(f"Converting to {base}")
         return [bin(i)[2:] for i in loi]
     elif base == "oct":
-        print(f"Converting to {base}")
         return [oct(i)[2:] for i in loi]
     elif base == "dec":
-        print(f"Converting to {base}")
         return [str(i) for i in loi]
     elif base == "hex":
-        print(f"Converting to {base}")
         return [better_hex(i) for i in loi]
     else:
         print(f"Unknown base: {base}, assume decimal")
@@ -101,48 +100,53 @@ def display_one_char(i: int) -> str:
     """
     Display an integer as the corresponding character,
     if the character can be displayed, 
-    otherwise display a ...
+    otherwise display the hex value between square brackets
+    :param i: the ordinal value of a character
     """
     if i in range(0, 32):
         return CTRL_CHARS[i]
-    if i == 32:
+    elif i == 32:
         return "[ ]"
         #return "."
-    if i in range(33, 126):
+    elif i in range(33, 126):
+        return chr(i)
+    elif i == 127:
+        return "[DEL]"
+    elif i in range(128, 687):
         return chr(i)
     else:
         return "[" + better_hex(i) + "]"
 
 
 def display_loi(loi: list[int]) -> list[str]:
+    """
+    Return a representation for each integer in the list
+    :param loi: a list of integers
+                Each integer is the ordinal value of a character
+    """
     return [display_one_char(i) for i in loi]
 
 
+def format_line(
+        loi: list[int], 
+        base: str,
+        width: int,
+        side: str,
+        ) -> str:
+    """
+    Format a line
+    Typically, the loi has 4 or 8 elements
+    Show the loi elements in the one of the bases
+    and show the characters on the side, if they can be printed
+    """
+
+    main = ' '.join(loi2show(loi, base))
+    side = ' '.join(display_loi(loi))
+    if side == "L":
+        return side + ' | ' + main
+    else:
+        return main + ' | ' + side
+
 if __name__ == "__main__":
-    print(txt2loi("abc"))
-    print(txt2loi("ABC"))
-    a = "123éàèðαא☺ꞅ"
-    print(txt2loi(a))
-    print(txt2loi(bytes(a, encoding="utf-8")))
-    print(txt2loi(bytes(a, encoding="utf-16")))
-    print(txt2loi(bytes(a, encoding="utf-32")))
-    print(txt2loi(bytes("123", encoding="ascii")))
-
-
-    print(loi2show(txt2loi("abc"), "bin"))
-    print(loi2show(txt2loi("abc"), "oct"))
-    print(loi2show(txt2loi("abc"), "hex"))
-    print(loi2show(txt2loi("abc"), "dec"))
-    print(loi2show(txt2loi("abc")))
-
-    for s in ["abc", "123", "éàèðα", "א☺ꞅ"]:
-        for b in ["bin", "oct", "hex", "dec"]:
-            print(loi2show(txt2loi(s), b))
-
-    for s in ["abc", "123", "éàèðα", "א☺ꞅ"]:
-        print(display_loi(txt2loi(s)))
-
-    print(display_loi(range(0,33)))
-
-
+    print("module executed as main")
 
