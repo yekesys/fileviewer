@@ -2,7 +2,7 @@
 
 View a file character by character.
 
-This is a public repository (open to all).
+This is a public repository (readable by all).
 
 Please mention the source repository and the author if you use this code.
 
