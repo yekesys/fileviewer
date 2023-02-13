@@ -1,8 +1,17 @@
+# pylint: disable=C0305
 import json
 
-import filev_utils as fu
+import code.filev_utils as fu
 
 print("start ...")
+
+def call_format_line(loi, b, w, sd):
+    print("trying:",loi)
+    try:
+        return fu.format_line(loi, b, w, sd)
+    except fu.CharactersDoNotFitError as e:
+        return str(e)
+
 
 if __name__ == "__main__":
     print(fu.txt2loi("abc"))
@@ -30,14 +39,49 @@ if __name__ == "__main__":
 
     print(fu.display_loi(range(0,33)))
 
-    for s in ["abc", "123", "éàèðα", "א☺ꞅ"]:
-        print(fu.format_line(fu.txt2loi(s), "hex", 80, "R"))
-        print(fu.format_line(fu.txt2loi(s), "dec", 80, "L"))
-        print(fu.format_line(fu.txt2loi(s), "bin", 80, "L"))
-        print(fu.format_line(fu.txt2loi(s), "oct", 80, "L"))
-        print(fu.format_line(fu.txt2loi(s), "hex", 120, "R"))
-        print(fu.format_line(fu.txt2loi(s), "hex", 40, "R"))
+    #for s in ["abc", "123", "éàèðα", "א☺ꞅ", "abcdefgi"]:
+    for s in ["éàèðα", "א☺ꞅ", ]:
+        print(call_format_line(fu.txt2loi(s), "hex", 80, "R"))
+        print(call_format_line(fu.txt2loi(s), "dec", 80, "L"))
+        print(call_format_line(fu.txt2loi(s), "bin", 80, "L"))
+        print(call_format_line(fu.txt2loi(s), "oct", 80, "L"))
+        print(call_format_line(fu.txt2loi(s), "hex", 120, "R"))
+        print(call_format_line(fu.txt2loi(s), "hex", 40, "R"))
 
+if False:
+
+    # get the max length
+    #print(max([len(c) for c in fu.loi2show(list(range(100)), "bin")]))
+    print(max([len(c) for c in fu.loi2show(list(range(1000)), "bin")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(10000)), "bin")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(100000)), "bin")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(1000000)), "bin")]))
+
+    #print(max([len(c) for c in fu.loi2show(list(range(100)), "oct")]))
+    print(max([len(c) for c in fu.loi2show(list(range(1000)), "oct")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(10000)), "oct")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(100000)), "oct")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(1000000)), "oct")]))
+
+    #print(max([len(c) for c in fu.loi2show(list(range(100)), "dec")]))
+    print(max([len(c) for c in fu.loi2show(list(range(1000)), "dec")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(10000)), "dec")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(100000)), "dec")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(1000000)), "dec")]))
+
+    #print(max([len(c) for c in fu.loi2show(list(range(100)), "hex")]))
+    print(max([len(c) for c in fu.loi2show(list(range(1000)), "hex")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(10000)), "hex")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(100000)), "hex")]))
+    #print(max([len(c) for c in fu.loi2show(list(range(1000000)), "hex")]))
+
+    # get the max length
+    #print(max([len(c) for c in fu.display_loi(list(range(1000000)))]))
+    #print(max([len(c) for c in fu.display_loi(list(range(1000000)))]))
+    #print(max([len(c) for c in fu.display_loi(list(range(1000000)))]))
+    #print(max([len(c) for c in fu.display_loi(list(range(1000000)))]))
+
+    #print(fu.loi2show([1000,], "hex"))
 
 print("...done")
 

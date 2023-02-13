@@ -86,16 +86,18 @@ input_data = [ ( [97, 98, 99],
                ),
                ( [233, 224, 232, 240, 945],
                  #["[E9]", "[E0]", "[E8]", "[F0]", "[3B1]"],
-                 [ "é", "à", "è", "ð", "[3B1]"],
+                 #[ "é", "à", "è", "ð", "[3B1]"],
+                 [ "é", "à", "è", "ð", ""],
                ),
                ( [1488, 9786, 42885],
-                 ["[5D0]", "[263A]", "[A785]"],
+                 #["[5D0]", "[263A]", "[A785]"],
+                 ["", "", ""],
                ),
                ( range(0, 33),
                  ["NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL", "BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI", "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB", "CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US", "[ ]"],
                ),
                ( [127, ],
-                 ["[DEL]", ],
+                 ["DEL", ],
                ),
              ]
 @pytest.mark.parametrize("input_param", input_data)
@@ -114,5 +116,18 @@ input_data = [ ( "abc", "utf-8 or other" ),
 def test_detect_encoding(input_param):
     s, expected = input_param
     assert expected == filev_utils.detect_encoding(s)
+
+
+#input_data = [ "abcde",
+#               "w35klasdfkéàèôêĝŵ^bä",
+#               "123éàèðαא☺ꞅ",
+#             ]
+#@pytest.mark.parametrize("input_param", input_data)
+#def test_guess_length(input_param):
+#    loi = filev_utils.txt2loi(input_param)
+#    assert len(filev_utils.format_line(loi, "bin", 80, "R")) == filev_utils.format_ln_guess_length(loi, 3, 8)
+#    assert len(filev_utils.format_line(loi, "oct", 80, "R")) == filev_utils.format_ln_guess_length(loi, 3, 4)
+#    assert len(filev_utils.format_line(loi, "dec", 80, "R")) == filev_utils.format_ln_guess_length(loi, 3, 4)
+#    assert len(filev_utils.format_line(loi, "hex", 80, "R")) == filev_utils.format_ln_guess_length(loi, 3, 4)
 
 

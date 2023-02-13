@@ -1,4 +1,4 @@
-
+# pylint: disable=C0305
 """
 
 Glossary:
@@ -41,32 +41,47 @@ CTRL_CHARS = { 0: "NUL",
                31: "US",
                }
 
-def detect_encoding(s: bytes) -> str:
+
+class CharactersDoNotFitError(Exception):
+    """
+    Raise when trying to put too many characters in a given width
+    """
+    def __init__(self, width=0, loi_len=0):
+        if loi_len:
+            self.message  = f"Cannot fit {loi_len} characters "
+        else:
+            self.message  = "Cannot fit all characters "
+        if width:
+            self.message += f"on a line of width {width}"
+        else:
+            self.message += "on one line"
+        self.message += ".  Try a higher width or display less characters"
+        super().__init__(self.message)
+
+
+def detect_encoding(input_string: bytes) -> str:
     """
     An attempt to detect the utf encoding
     """
-    if s[0] == 255 and s[1] == 254:
-        if s[2] == 0:
+    if input_string[0] == 255 and input_string[1] == 254:
+        if input_string[2] == 0:
             return "utf-32"
-        else:
-            return "utf-16"
-    else:
-        return "utf-8 or other"
+        return "utf-16"
+    return "utf-8 or other"
 
 
-def txt2loi(s) -> list[int]:
+def txt2loi(input_string) -> list[int]:
     """
     Convert a string or bytes into a list of integers (loi)
     """
-    print(type(s))
-    if isinstance(s, str):
-        return [ord(c) for c in s]
-    elif isinstance(s, bytes):
-        print(detect_encoding(s))
-        return [c for c in s]
-    else:
-        print("Expecting types str or bytes, found:",type(s))
-        return []
+    print(type(input_string))
+    if isinstance(input_string, str):
+        return [ord(c) for c in input_string]
+    if isinstance(input_string, bytes):
+        print(detect_encoding(input_string))
+        return list(input_string)
+    print("Expecting types str or bytes, found:",type(input_string))
+    return []
 
 def better_hex(i: int) -> str:
     """
@@ -85,37 +100,35 @@ def loi2show(loi: list[int], base: str = "dec") -> list[str]:
     print(f"Converting to {base}")
     if base == "bin":
         return [bin(i)[2:] for i in loi]
-    elif base == "oct":
+    if base == "oct":
         return [oct(i)[2:] for i in loi]
-    elif base == "dec":
+    if base == "dec":
         return [str(i) for i in loi]
-    elif base == "hex":
+    if base == "hex":
         return [better_hex(i) for i in loi]
-    else:
-        print(f"Unknown base: {base}, assume decimal")
-        return [str(i) for i in loi]
+    print(f"Unknown base: {base}, assume decimal")
+    return [str(i) for i in loi]
 
-    
+
 def display_one_char(i: int) -> str:
     """
     Display an integer as the corresponding character,
-    if the character can be displayed, 
+    if the character can be displayed,
     otherwise display the hex value between square brackets
     :param i: the ordinal value of a character
     """
     if i in range(0, 32):
         return CTRL_CHARS[i]
-    elif i == 32:
+    if i == 32:
         return "[ ]"
         #return "."
-    elif i in range(33, 126):
+    if i in range(33, 126):
         return chr(i)
-    elif i == 127:
-        return "[DEL]"
-    elif i in range(128, 687):
+    if i == 127:
+        return "DEL"
+    if i in range(128, 687):
         return chr(i)
-    else:
-        return "[" + better_hex(i) + "]"
+    return ""
 
 
 def display_loi(loi: list[int]) -> list[str]:
@@ -127,25 +140,97 @@ def display_loi(loi: list[int]) -> list[str]:
     return [display_one_char(i) for i in loi]
 
 
+def format_ln_guess_length(loi, one_side_char_width, one_ordinal_width):
+    """
+    working on it.  Maybe will not keep
+    """
+    return len(loi) * (one_side_char_width + one_ordinal_width) + 3
+
+
+def format_ln_does_it_fit(loi, one_side_char_width, one_ordinal_width, width):
+    """
+    working on it.  Maybe will not keep
+    """
+    return format_ln_guess_length(loi, one_side_char_width, one_ordinal_width) > width
+
+
 def format_line(
-        loi: list[int], 
+        loi: list[int],
         base: str,
-        width: int,
-        side: str,
+        width: int=80,
+        side: str="R",
         ) -> str:
     """
     Format a line
     Typically, the loi has 4 or 8 elements
     Show the loi elements in the one of the bases
     and show the characters on the side, if they can be printed
+    Assume
+       A max of 4 characters to display ordinals
+       A max of 3 characters to display characters
+       Two spots at beginning of line to show continuation ".."
+       Separator " | " between ordinals and side
+       Simple space as separator everywhere
     """
+    # define a few things
+    # Note that if a char needs more than the width below, we add a line
+    char_sep = " "
+    side_sep = " | "
+    one_side_char_width = 3
+    if base in ["dec", "oct", "hex"]:
+        one_ordinal_width = 2
+    elif base in ["bin", ]:
+        one_ordinal_width = 8
+    else:  # always a default
+        one_ordinal_width = 2
 
-    main = ' '.join(loi2show(loi, base))
-    side = ' '.join(display_loi(loi))
+    # can it all fit on one line?
+    if format_ln_does_it_fit(loi, one_side_char_width, one_ordinal_width, width):
+        print("Displaying ",loi)
+        raise CharactersDoNotFitError(width, len(loi))
+
+    # list of strings
+    loc_ordi = loi2show(loi, base)
+    loc_side = display_loi(loi)
+
+    # Allow for up to 8 lines to display
+    max_lines = 8
+    the_ordinals  = [[] for i in range(max_lines)]
+    the_ordinals_str = [[] for i in range(max_lines)]
+    chars_on_side = []
+
+    # index 0 is right-most part of the number
+    for one_ordi,one_side in zip(loc_ordi, loc_side):
+        #print(one_ordi, one_side)
+        c = one_ordi
+        for i in range(max_lines):
+            #print("======")
+            #print(c)
+            #print(the_ordinals)
+            the_ordinals[i].append(c[-one_ordinal_width:].rjust(one_ordinal_width))
+            c = c[:-one_ordinal_width]
+            #print(c)
+            #print(the_ordinals)
+            #print("======")
+        chars_on_side.append(one_side.rjust(one_side_char_width))
+        #print(one_ordi, one_side)
+
+    print("input:")
+    print(loi)
+    print("results:")
+    for i in range(max_lines):
+        the_ordinals_str[i] = char_sep.join(the_ordinals[i])
+        print(the_ordinals_str[i])
+    chars_on_side_str = char_sep.join(chars_on_side)
+    print(chars_on_side_str)
+    print("done")
+
     if side == "L":
-        return side + ' | ' + main
-    else:
-        return main + ' | ' + side
+        return chars_on_side_str + side_sep + the_ordinals_str
+        # this has to be across 8 lines
+    return the_ordinals_str + side_sep + chars_on_side_str
+    # this has to be across 8 lines
+
 
 if __name__ == "__main__":
     print("module executed as main")
