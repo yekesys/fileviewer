@@ -1,5 +1,9 @@
 # pylint: disable=C0305
 """
+to do:
+continuation character
+pad out the line at the end of the file
+decimals over three characters
 
 Glossary:
  - loi = list of integers
@@ -74,11 +78,11 @@ def txt2loi(input_string) -> list[int]:
     """
     Convert a string or bytes into a list of integers (loi)
     """
-    print(type(input_string))
+    #print(type(input_string))
     if isinstance(input_string, str):
         return [ord(c) for c in input_string]
     if isinstance(input_string, bytes):
-        print(detect_encoding(input_string))
+        #print(detect_encoding(input_string))
         return list(input_string)
     print("Expecting types str or bytes, found:",type(input_string))
     return []
@@ -97,7 +101,7 @@ def loi2show(loi: list[int], base: str = "dec") -> list[str]:
                 Each integer is the ordinal value of a character
     :param base: One of the following: "bin", "oct", "dec", "hex"
     """
-    print(f"Converting to {base}")
+    #print(f"Converting to {base}")
     if base == "bin":
         return [bin(i)[2:] for i in loi]
     if base == "oct":
@@ -126,6 +130,9 @@ def display_one_char(i: int) -> str:
         return chr(i)
     if i == 127:
         return "DEL"
+    if i in [132, 133, ]:
+        # 'blacklist' some characters that do not print right
+        return ""
     if i in range(128, 687):
         return chr(i)
     return ""
@@ -157,7 +164,7 @@ def format_ln_does_it_fit(loi, one_side_char_width, one_ordinal_width, width):
 def format_line(
         loi: list[int],
         base: str,
-        width: int=80,
+        width: int=80,    # do I really need this?
         side: str="R",
         ) -> str:
     """
@@ -186,7 +193,7 @@ def format_line(
 
     # can it all fit on one line?
     if format_ln_does_it_fit(loi, one_side_char_width, one_ordinal_width, width):
-        print("Displaying ",loi)
+        #print("Displaying ",loi)
         raise CharactersDoNotFitError(width, len(loi))
 
     # list of strings
@@ -212,25 +219,54 @@ def format_line(
             #print(c)
             #print(the_ordinals)
             #print("======")
-        chars_on_side.append(one_side.rjust(one_side_char_width))
+        chars_on_side.append(one_side.center(one_side_char_width))
         #print(one_ordi, one_side)
 
-    print("input:")
-    print(loi)
-    print("results:")
+    #print("input:")
+    #print(loi)
+    #print("results:")
     for i in range(max_lines):
         the_ordinals_str[i] = char_sep.join(the_ordinals[i])
-        print(the_ordinals_str[i])
+        #print(the_ordinals_str[i])
     chars_on_side_str = char_sep.join(chars_on_side)
-    print(chars_on_side_str)
-    print("done")
+    #print(chars_on_side_str)
+    #print("done")
 
-    if side == "L":
-        return chars_on_side_str + side_sep + the_ordinals_str
-        # this has to be across 8 lines
-    return the_ordinals_str + side_sep + chars_on_side_str
+    chars_on_side_curr_str = chars_on_side_str 
+    built_output = ""
+    line_sep = "" 
+    for one_ord_str in the_ordinals_str[::-1]:
+        if one_ord_str.lstrip(" "):
+            if side == "L":
+                built_output += line_sep + chars_on_side_curr_str + side_sep + one_ord_str + "[eol]"
+            else:
+                built_output += line_sep + one_ord_str + side_sep + chars_on_side_curr_str + "[eol]"
+            # Print this just once, now put spaces
+            chars_on_side_curr_str = ''.ljust(len(chars_on_side_str))
+            # Add line separator
+            line_sep = "\n"
+    return built_output
     # this has to be across 8 lines
 
+
+def view_file(
+        file_name: str,
+        base: str = "hex",
+        chunk_size: int = 8,
+        side: str = "R",
+        ):
+    with open(file_name, "rb") as f:
+        while ch_bytes := f.read(chunk_size):
+            print(format_line(
+                loi=txt2loi(ch_bytes),
+                base=base,
+                width=10000,  # do I really need this?
+                side=side,
+                ))
+
+
+
+	
 
 if __name__ == "__main__":
     print("module executed as main")
