@@ -213,16 +213,16 @@ def format_line(
     # index 0 is right-most part of the number
     for one_ordi,one_side in zip(loc_ordi, loc_side):
         #print(one_ordi, one_side)
-        #c = one_ordi
-        #for i in range(max_lines):
-        #    #print("======")
-        #    #print(c)
-        #    #print(the_ordinals)
-        #    the_ordinals[i].append(c[-one_ordinal_width:].rjust(one_ordinal_width))
-        #    c = c[:-one_ordinal_width]
-        #    #print(c)
-        #    #print(the_ordinals)
-        #    #print("======")
+        c = one_ordi
+        for i in range(max_lines):
+            #print("======")
+            #print(c)
+            #print(the_ordinals)
+            the_ordinals[i].append(c[-one_ordinal_width:].rjust(one_ordinal_width))
+            c = c[:-one_ordinal_width]
+            #print(c)
+            #print(the_ordinals)
+            #print("======")
         chars_on_side.append(one_side.center(one_side_char_width))
         #print(one_ordi, one_side)
 
@@ -239,6 +239,7 @@ def format_line(
     chars_on_side_curr_str = chars_on_side_str
     built_output = ""
     line_sep = ""
+    #print(the_ordinals_str)
     for one_ord_str in the_ordinals_str[::-1]:
         if one_ord_str.lstrip(" "):
             if side == "L":
@@ -249,8 +250,8 @@ def format_line(
             chars_on_side_curr_str = ''.ljust(len(chars_on_side_str))
             # Add line separator
             line_sep = "\n"
+
     return built_output
-    # this has to be across 8 lines
 
 
 def view_file(
