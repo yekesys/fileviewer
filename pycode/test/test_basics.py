@@ -103,7 +103,7 @@ input_data = [ ( [97, 98, 99],
 @pytest.mark.parametrize("input_param", input_data)
 def test_loi2show(input_param):
     input_loi, expected = input_param
-    assert expected == filev_utils.display_loi(input_loi)
+    assert expected == filev_utils.loi2los_prnt(input_loi)
 
 
 

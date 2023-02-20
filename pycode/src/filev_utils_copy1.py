@@ -6,14 +6,7 @@ pad out the line at the end of the file
 decimals over three characters
 
 Glossary:
- - loi = list of integers, with each integer
-         as the ordinal of the character
- - los = list of strings
- - los_prnt = list of strings, with each string being the
-         printable version of the character
- - los_ordi = list of strings, with each string being the
-         string representation of the character in a 
-         specific base
+ - loi = list of integers
 
 """
 
@@ -53,6 +46,23 @@ CTRL_CHARS = { 0: "NUL",
                }
 
 
+class CharactersDoNotFitError(Exception):
+    """
+    Raise when trying to put too many characters in a given width
+    """
+    def __init__(self, width=0, loi_len=0):
+        if loi_len:
+            self.message  = f"Cannot fit {loi_len} characters "
+        else:
+            self.message  = "Cannot fit all characters "
+        if width:
+            self.message += f"on a line of width {width}"
+        else:
+            self.message += "on one line"
+        self.message += ".  Try a higher width or display less characters"
+        super().__init__(self.message)
+
+
 def detect_encoding(input_string: bytes) -> str:
     """
     An attempt to detect the utf encoding
@@ -83,7 +93,7 @@ def better_hex(i: int) -> str:
     """
     return hex(i)[2:].upper()
 
-def loi2los_ordi(loi: list[int], base: str = "dec") -> list[str]:
+def loi2show(loi: list[int], base: str = "dec") -> list[str]:
     """
     Return a list of strings, with each string being
     the representation of the integer
@@ -132,13 +142,27 @@ def display_one_char(i: int) -> str:
     return rslt
 
 
-def loi2los_prnt(loi: list[int]) -> list[str]:
+def display_loi(loi: list[int]) -> list[str]:
     """
     Return a representation for each integer in the list
     :param loi: a list of integers
                 Each integer is the ordinal value of a character
     """
     return [display_one_char(i) for i in loi]
+
+
+def format_ln_guess_length(loi, one_side_char_width, one_ordinal_width):
+    """
+    working on it.  Maybe will not keep
+    """
+    return len(loi) * (one_side_char_width + one_ordinal_width) + 3
+
+
+def format_ln_does_it_fit(loi, one_side_char_width, one_ordinal_width, width):
+    """
+    working on it.  Maybe will not keep
+    """
+    return format_ln_guess_length(loi, one_side_char_width, one_ordinal_width) > width
 
 
 def format_line(
@@ -164,35 +188,43 @@ def format_line(
     char_sep = " "
     side_sep = " | "
     one_side_char_width = 3
-    if base in ["hex", ]:
+    if base in ["dec", "oct", "hex"]:
         one_ordinal_width = 2
-    elif base in ["oct", "dec", ]:
-        one_ordinal_width = 3
     elif base in ["bin", ]:
         one_ordinal_width = 8
     else:  # always a default
         one_ordinal_width = 2
 
+    # can it all fit on one line?
+    if format_ln_does_it_fit(loi, one_side_char_width, one_ordinal_width, width):
+        #print("Displaying ",loi)
+        raise CharactersDoNotFitError(width, len(loi))
+
     # list of strings
-    los_ordi = loi2los_ordi(loi, base)
-    los_prnt = loi2los_prnt(loi)
+    loc_ordi = loi2show(loi, base)
+    loc_side = display_loi(loi)
 
     # Allow for up to 8 lines to display
-    # Adjust if needed
-    # Adding too many is not an issue, except with performance
     max_lines = 8
     the_ordinals  = [[] for i in range(max_lines)]
     the_ordinals_str = [[] for i in range(max_lines)]
     chars_on_side = []
 
     # index 0 is right-most part of the number
-    for one_ordi,one_side in zip(los_ordi, los_prnt):
+    for one_ordi,one_side in zip(loc_ordi, loc_side):
         #print(one_ordi, one_side)
         c = one_ordi
         for i in range(max_lines):
+            #print("======")
+            #print(c)
+            #print(the_ordinals)
             the_ordinals[i].append(c[-one_ordinal_width:].rjust(one_ordinal_width))
             c = c[:-one_ordinal_width]
+            #print(c)
+            #print(the_ordinals)
+            #print("======")
         chars_on_side.append(one_side.center(one_side_char_width))
+        #print(one_ordi, one_side)
 
     #print("input:")
     #print(loi)
