@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# my exclusions
+mirr_exec_starttime_dege_chris.txt
+pycode/mirr_exec_starttime_dege_chris.txt
+
+
