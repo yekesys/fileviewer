@@ -131,5 +131,6 @@ dmypy.json
 # my exclusions
 mirr_exec_starttime_dege_chris.txt
 pycode/mirr_exec_starttime_dege_chris.txt
+README_copy.sh
 
 
