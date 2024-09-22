@@ -12,8 +12,13 @@ To install:
 * No installations are needed
 
 To execute:\
-`python run_view_sample_jpeg.py`
+`python run_view_sample_jpeg.py`\
+(Or `python3` or `py` depending on your operating system)
+
+Sample data is in the /data folder.
 
 I am using pylint\
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/PyCQA/pylint)
+
+
 

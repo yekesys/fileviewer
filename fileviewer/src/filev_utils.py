@@ -64,7 +64,7 @@ def detect_encoding(input_string: bytes) -> str:
     return "utf-8 or other"
 
 
-def txt2loi(input_string) -> list[int]:
+def txt2loi(input_string) -> list:
     """
     Convert a string or bytes into a list of integers (loi)
     """
@@ -83,7 +83,7 @@ def better_hex(i: int) -> str:
     """
     return hex(i)[2:].upper()
 
-def loi2los_ordi(loi: list[int], base: str = "dec") -> list[str]:
+def loi2los_ordi(loi: list, base: str = "dec") -> list:
     """
     Return a list of strings, with each string being
     the representation of the integer
@@ -132,7 +132,7 @@ def display_one_char(i: int) -> str:
     return rslt
 
 
-def loi2los_prnt(loi: list[int]) -> list[str]:
+def loi2los_prnt(loi: list) -> list:
     """
     Return a representation for each integer in the list
     :param loi: a list of integers
@@ -142,7 +142,7 @@ def loi2los_prnt(loi: list[int]) -> list[str]:
 
 
 def format_line(
-        loi: list[int],
+        loi: list,
         base: str,
         width: int=80,    # do I really need this?
         side: str="R",
